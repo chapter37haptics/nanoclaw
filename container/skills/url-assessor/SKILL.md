@@ -91,7 +91,7 @@ Write a JSON file to `~/nanoclaw/ipc/actions/<uuid>.json`:
 
 ### 10. Wait for result
 
-Poll `~/nanoclaw/ipc/results/<same-uuid>.json` every 2 seconds, up to 60 seconds.
+Poll `/workspace/ipc/input/<uuid>-result.json` every 2 seconds, up to 60 seconds.
 
 On success result (`"status": "success"`):
 > "Done. Here's what changed: [result.summary]"
