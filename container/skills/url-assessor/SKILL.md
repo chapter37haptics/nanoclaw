@@ -32,10 +32,10 @@ Focus on: what it does, how to install it, what category it is
 
 ### 4. Read current setup
 
-Read these files from the mounted ~/.claude (read-only):
-- `~/.claude/settings.json` — installed plugins and MCP servers
-- `~/.claude/CLAUDE.md` — workflow rules and preferences
-- `~/.claude/skills/` — list installed custom skills
+Read these files from the host Claude setup (mounted read-only at /workspace/host-claude):
+- `/workspace/host-claude/settings.json` — installed plugins and MCP servers
+- `/workspace/host-claude/CLAUDE.md` — workflow rules and preferences
+- `/workspace/host-claude/skills/` — list installed custom skills
 
 ### 5. Send Exchange 1 — assessment
 

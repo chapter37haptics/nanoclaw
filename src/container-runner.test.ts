@@ -86,6 +86,7 @@ vi.mock('child_process', async () => {
   };
 });
 
+import os from 'os';
 import { runContainerAgent, ContainerOutput } from './container-runner.js';
 import type { RegisteredGroup } from './types.js';
 
@@ -214,9 +215,16 @@ describe('container-runner timeout behavior', () => {
     spawnMock.mockClear();
 
     // Simulate ~/.claude existing
-    const fsMock = (await import('fs')).default as typeof import('fs') & { existsSync: ReturnType<typeof vi.fn> };
+    const fsMock = (await import('fs')).default as typeof import('fs') & {
+      existsSync: ReturnType<typeof vi.fn>;
+    };
     fsMock.existsSync.mockImplementation((p: unknown) => {
-      if (typeof p === 'string' && p.includes('.claude') && !p.includes('sessions')) return true;
+      if (
+        typeof p === 'string' &&
+        p.includes('.claude') &&
+        !p.includes('sessions')
+      )
+        return true;
       return false;
     });
 
@@ -234,6 +242,14 @@ describe('container-runner timeout behavior', () => {
 
     const spawnArgs: string[] = spawnMock.mock.calls[0]?.[1] ?? [];
     const spawnArgsStr = spawnArgs.join(' ');
-    expect(spawnArgsStr).toContain('host-claude');
+    const homeDir = os.homedir();
+    expect(spawnArgsStr).toContain(`${homeDir}/.claude`);
+    expect(spawnArgsStr).toContain('/workspace/host-claude');
+    // readonlyMountArgs produces: ['-v', '<hostPath>:<containerPath>:ro']
+    // so the single arg containing both paths also ends with ':ro'
+    const hasReadonlyMount = spawnArgs.some(
+      (arg) => arg.includes('.claude') && arg.includes('host-claude') && arg.includes(':ro'),
+    );
+    expect(hasReadonlyMount).toBe(true);
   });
 });
