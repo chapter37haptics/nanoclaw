@@ -248,7 +248,10 @@ describe('container-runner timeout behavior', () => {
     // readonlyMountArgs produces: ['-v', '<hostPath>:<containerPath>:ro']
     // so the single arg containing both paths also ends with ':ro'
     const hasReadonlyMount = spawnArgs.some(
-      (arg) => arg.includes('.claude') && arg.includes('host-claude') && arg.includes(':ro'),
+      (arg) =>
+        arg.includes('.claude') &&
+        arg.includes('host-claude') &&
+        arg.includes(':ro'),
     );
     expect(hasReadonlyMount).toBe(true);
   });

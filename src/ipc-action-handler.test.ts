@@ -62,18 +62,32 @@ describe('ipc-action-handler', () => {
     process.env.HOME = TEST_DIR;
     try {
       await mkdir(path.join(TEST_DIR, '.claude'), { recursive: true });
-      await writeFile(path.join(TEST_DIR, '.claude', 'settings.json'), JSON.stringify({ mcpServers: {} }));
+      await writeFile(
+        path.join(TEST_DIR, '.claude', 'settings.json'),
+        JSON.stringify({ mcpServers: {} }),
+      );
 
       const result = await executeAction({
         id: 'act-1',
         type: 'mcp_add',
-        payload: { key: 'test-server', config: { command: 'npx', args: ['test'] } },
+        payload: {
+          key: 'test-server',
+          config: { command: 'npx', args: ['test'] },
+        },
         tool_name: 'Test MCP',
         requested_at: new Date().toISOString(),
       });
       expect(result.status).toBe('success');
-      const updated = JSON.parse(await readFile(path.join(TEST_DIR, '.claude', 'settings.json'), 'utf-8'));
-      expect(updated.mcpServers['test-server']).toEqual({ command: 'npx', args: ['test'] });
+      const updated = JSON.parse(
+        await readFile(
+          path.join(TEST_DIR, '.claude', 'settings.json'),
+          'utf-8',
+        ),
+      );
+      expect(updated.mcpServers['test-server']).toEqual({
+        command: 'npx',
+        args: ['test'],
+      });
     } finally {
       process.env.HOME = origHome;
     }
@@ -84,16 +98,24 @@ describe('ipc-action-handler', () => {
     const origHome = process.env.HOME;
     process.env.HOME = TEST_DIR;
     try {
-      await mkdir(path.join(TEST_DIR, '.claude', 'skills'), { recursive: true });
+      await mkdir(path.join(TEST_DIR, '.claude', 'skills'), {
+        recursive: true,
+      });
       const result = await executeAction({
         id: 'act-2',
         type: 'skill_write',
-        payload: { skill_name: 'my-skill', skill_content: '# My Skill\nDoes stuff.' },
+        payload: {
+          skill_name: 'my-skill',
+          skill_content: '# My Skill\nDoes stuff.',
+        },
         tool_name: 'My Skill',
         requested_at: new Date().toISOString(),
       });
       expect(result.status).toBe('success');
-      const content = await readFile(path.join(TEST_DIR, '.claude', 'skills', 'my-skill.md'), 'utf-8');
+      const content = await readFile(
+        path.join(TEST_DIR, '.claude', 'skills', 'my-skill.md'),
+        'utf-8',
+      );
       expect(content).toContain('# My Skill');
     } finally {
       process.env.HOME = origHome;
@@ -106,7 +128,10 @@ describe('ipc-action-handler', () => {
     process.env.HOME = TEST_DIR;
     try {
       await mkdir(path.join(TEST_DIR, '.claude'), { recursive: true });
-      await writeFile(path.join(TEST_DIR, '.claude', 'CLAUDE.md'), '# Existing\n');
+      await writeFile(
+        path.join(TEST_DIR, '.claude', 'CLAUDE.md'),
+        '# Existing\n',
+      );
       const result = await executeAction({
         id: 'act-3',
         type: 'claude_md_append',
@@ -115,7 +140,10 @@ describe('ipc-action-handler', () => {
         requested_at: new Date().toISOString(),
       });
       expect(result.status).toBe('success');
-      const content = await readFile(path.join(TEST_DIR, '.claude', 'CLAUDE.md'), 'utf-8');
+      const content = await readFile(
+        path.join(TEST_DIR, '.claude', 'CLAUDE.md'),
+        'utf-8',
+      );
       expect(content).toContain('## New Section');
       expect(content).toContain('# Existing');
     } finally {

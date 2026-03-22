@@ -40,9 +40,13 @@ export async function executeAction(action: ActionFile): Promise<ActionResult> {
     switch (action.type) {
       case 'plugin_install': {
         const { repo } = action.payload as { repo: string };
-        const { stdout } = await execFileAsync('claude', ['plugin', 'add', repo], {
-          env: { ...process.env },
-        });
+        const { stdout } = await execFileAsync(
+          'claude',
+          ['plugin', 'add', repo],
+          {
+            env: { ...process.env },
+          },
+        );
         return {
           status: 'success',
           summary: `Plugin ${repo} installed. ${stdout.trim()}`,

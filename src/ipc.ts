@@ -7,10 +7,7 @@ import { DATA_DIR, IPC_POLL_INTERVAL, TIMEZONE } from './config.js';
 import { AvailableGroup } from './container-runner.js';
 import { createTask, deleteTask, getTaskById, updateTask } from './db.js';
 import { isValidGroupFolder, resolveGroupIpcPath } from './group-folder.js';
-import {
-  executeAction,
-  writeResult,
-} from './ipc-action-handler.js';
+import { executeAction, writeResult } from './ipc-action-handler.js';
 import { logger } from './logger.js';
 import { RegisteredGroup } from './types.js';
 
