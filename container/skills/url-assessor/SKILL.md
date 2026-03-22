@@ -4,20 +4,21 @@ Activated when a WhatsApp message contains an `instagram.com` URL.
 
 ## Steps
 
-### 1. Extract content
+### 1. Extract transcript
 
 Run the extraction helper:
 ```bash
 python /skills/url-assessor/extract.py "<instagram_url>"
 ```
 
-Parse the JSON output. If `error: private_or_unavailable`, reply:
-> "This post is private or unavailable. Can you share the tool name directly?"
-Then stop.
+Parse the JSON output:
+- If `error: private_or_unavailable`, reply: "This post is private or unavailable. Can you share the tool name directly?" Then stop.
+- If `error: no_transcript`, reply: "Couldn't extract audio from this video. Can you tell me the tool name directly?" Then stop.
+- If any other `error`, reply: "Had trouble processing this video ([error]). Can you share the tool name?" Then stop.
 
 ### 2. Identify the tool
 
-From `caption` + `transcript`, identify the tool or feature being shown.
+From `transcript`, identify the tool or feature being shown.
 Look for: tool name, GitHub URL, website, install command.
 
 If you cannot identify a specific tool, reply:
@@ -41,7 +42,6 @@ Read these files from the host Claude setup (mounted read-only at /workspace/hos
 
 Reply in this format:
 ```
-Posted by @<poster> on <date>.
 This is [Tool] — a [plugin / MCP server / skill / workflow rule].
 It does [one-sentence description].
 
