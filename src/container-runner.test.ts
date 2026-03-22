@@ -207,4 +207,33 @@ describe('container-runner timeout behavior', () => {
     expect(result.status).toBe('success');
     expect(result.newSessionId).toBe('session-456');
   });
+
+  it('includes host ~/.claude as read-only mount at /workspace/host-claude', async () => {
+    const { spawn } = await import('child_process');
+    const spawnMock = spawn as ReturnType<typeof vi.fn>;
+    spawnMock.mockClear();
+
+    // Simulate ~/.claude existing
+    const fsMock = (await import('fs')).default as typeof import('fs') & { existsSync: ReturnType<typeof vi.fn> };
+    fsMock.existsSync.mockImplementation((p: unknown) => {
+      if (typeof p === 'string' && p.includes('.claude') && !p.includes('sessions')) return true;
+      return false;
+    });
+
+    fakeProc = createFakeProcess();
+
+    const resultPromise = runContainerAgent(
+      testGroup,
+      { ...testInput, isMain: false },
+      () => {},
+    );
+
+    // Emit close immediately
+    fakeProc.emit('close', 0);
+    await resultPromise;
+
+    const spawnArgs: string[] = spawnMock.mock.calls[0]?.[1] ?? [];
+    const spawnArgsStr = spawnArgs.join(' ');
+    expect(spawnArgsStr).toContain('host-claude');
+  });
 });

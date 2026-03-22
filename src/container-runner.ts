@@ -4,6 +4,7 @@
  */
 import { ChildProcess, exec, spawn } from 'child_process';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 
 import {
@@ -198,6 +199,16 @@ function buildVolumeMounts(
     containerPath: '/app/src',
     readonly: false,
   });
+
+  // Mount host ~/.claude read-only so container skills can read user's Claude setup
+  const hostClaudeDir = path.join(os.homedir(), '.claude');
+  if (fs.existsSync(hostClaudeDir)) {
+    mounts.push({
+      hostPath: hostClaudeDir,
+      containerPath: '/workspace/host-claude',
+      readonly: true,
+    });
+  }
 
   // Additional mounts validated against external allowlist (tamper-proof from containers)
   if (group.containerConfig?.additionalMounts) {
