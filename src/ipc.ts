@@ -6,7 +6,8 @@ import { CronExpressionParser } from 'cron-parser';
 import { DATA_DIR, IPC_POLL_INTERVAL, TIMEZONE } from './config.js';
 import { AvailableGroup } from './container-runner.js';
 import { createTask, deleteTask, getTaskById, updateTask } from './db.js';
-import { isValidGroupFolder } from './group-folder.js';
+import { isValidGroupFolder, resolveGroupIpcPath } from './group-folder.js';
+import { executeAction, parseActionFile, writeResult } from './ipc-action-handler.js';
 import { logger } from './logger.js';
 import { RegisteredGroup } from './types.js';
 
@@ -451,6 +452,27 @@ export async function processTaskIpc(
         logger.warn(
           { data },
           'Invalid register_group request - missing required fields',
+        );
+      }
+      break;
+
+    case 'install_action':
+      // Only main group can trigger host-side installations
+      if (!isMain) {
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized install_action attempt blocked — only main group allowed',
+        );
+        break;
+      }
+      {
+        const action = data as unknown as import('./ipc-action-handler.js').ActionFile;
+        const groupIpcInputDir = path.join(resolveGroupIpcPath(sourceGroup), 'input');
+        const result = await executeAction(action);
+        await writeResult(groupIpcInputDir, action.id, result);
+        logger.info(
+          { id: action.id, type: action.type, status: result.status, sourceGroup },
+          'Install action executed',
         );
       }
       break;
