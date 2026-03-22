@@ -40,3 +40,6 @@ groups/personal/*
 
 agents-sdk-docs
 .env.keys
+
+ipc/actions/*.json
+ipc/results/*.json
